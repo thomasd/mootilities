@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<base href="http://thomas/mootilities/" /><title>Request.JSONP</title>
+		<style type="text/css">
+			#log{
+				position:fixed;
+				right: 0;
+				top: 0;
+				background-color: #aaaaff;
+			}
+		</style>	
+		<script src="Lib/mootools-1.2.1-core-nc.js" type="text/javascript">
+		</script>
+		<script src="Lib/mootools-1.2-more.js" type="text/javascript">
+		</script>				
+		<script src="Source/XSR.js" type="text/javascript">
+		</script>
+		<script src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js" type="text/javascript">
+		</script>		
+		<script type="text/javascript">
+			/*if (!$defined(window['console'])) {
+				window.console = {
+					log: function(){
+						if (!$('log')) {
+							$(document.body).adopt(new Element('div', {
+								'id': 'log',
+								'styles': {
+									'position': 'absolute',
+									'top': '0',
+									'right': '0',
+									'background': '#fff',
+									'color': '#ff0000',
+									'font-weight': 'bold'
+								}
+							}));
+						}
+						$('log').set('html', $('log').get('html').concat($A(arguments).join(', ')).concat('<br />'));
+					}
+				};
+			}*/			
+			
+			window.addEvent('domready', function(){
+				var callbacks = {
+					'onComplete': function(data){
+						console.log('complete', arguments);
+					},
+					'onTimeout': function(){
+						console.log('timeout', arguments);
+					},
+					'onRequest': function(){
+						console.log('request', arguments);
+					},
+					'onCancel': function(){
+						console.log('cancel', arguments);
+					},
+					'onSuccess': function(){
+						console.log('success', arguments);
+					}					
+				}
+				
+				var req = new XSR.JSONP($merge({
+					'url': 'http://html-whitelist.appspot.com/whitelist',
+					'data': {
+						'url': 'http://www.google.at/'
+					},
+					'link': 'chain',
+					'callback': 'callback'
+				}, callbacks)).send();
+				
+				req.send({
+					'url': 'http://dulle.bplaced.net/import/test.php',
+					'data': {
+						'url': 'http://www.google.at/'
+					},
+					'callback': 'jsonp_callback'			
+				});
+							
+				new XSR.JSONP($merge({
+					'url': 'http://html-whitelist.appspot.com/whitelist',
+					'data': {
+						'url': 'http://www.google.at/'
+					},
+					'secure': true,
+					'callback': 'callback'
+				}, callbacks)).send();
+				
+				new XSR.HTMLP($merge({
+					'url': 'http://dulle.bplaced.net/import/test.php?' + $time(),
+					'data': {
+						'url': 'http://www.google.at/'
+					},
+					'update': 'content',
+					'callback': 'htmlp_callback'
+				}, callbacks)).send();
+				
+				new XSR.XMLP($merge({
+					'url': 'http://dulle.bplaced.net/import/test.php?' + $time(),
+					'data': {
+						'url': 'http://www.google.at/'
+					},
+					'callback': 'xmlp_callback'
+				}, callbacks)).send();
+			});
+		</script>
+	</head>
+	<body>
+		<div id="content"></div>
+		<div id='log'></div>
+	</body>
+</html>
